@@ -129,8 +129,8 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 comboBoxElementDelete.Items.Clear();
                 tagAndElements.Clear();
 
-                XDocument xmlDoc = XDocument.Load(openFileDialog.FileName);
-                var groupedElements = xmlDoc.Root.Elements().GroupBy(element => element.Name.LocalName).Select(group => new
+                XDocument xDoc = XDocument.Load(openFileDialog.FileName);
+                var groupedElements = xDoc.Root.Elements().GroupBy(element => element.Name.LocalName).Select(group => new
                 {
                     ElementName = group.Key,
                     Elements = group.Nodes()
@@ -138,31 +138,62 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                 foreach (var group in groupedElements)
                 {
-                    ListBox listBox = new ListBox()
+                    StackPanel stackPanelMain = new StackPanel()
                     {
-                        Background = Brushes.Transparent,
-                        BorderThickness = new Thickness(0)
+                        Orientation = Orientation.Vertical
                     };
 
                     tagAndElements.Add(group.ElementName, new List<string>());
 
-                    listBox.Items.Add(new ListBoxItem
+                    StackPanel stackPanelTag = new StackPanel()
                     {
-                        Content = group.ElementName.ToString(),
-                        FontWeight = FontWeights.Bold
+                        Orientation = Orientation.Horizontal
+                    };
+
+                    stackPanelTag.Children.Add(new ListBoxItem
+                    {
+                        Content = $"<{group.ElementName.ToString()}>"
                     });
+
+                    stackPanelMain.Children.Add(stackPanelTag);
+
                     foreach (var element in group.Elements)
                     {
-                        listBox.Items.Add(new ListBoxItem
+                        StackPanel stackPanelInner = new StackPanel()
                         {
-                            Content = element.ToString()
-                        });                       
+                            Orientation = Orientation.Horizontal
+                        };
+
+                        stackPanelInner.Children.Add(new ListBoxItem
+                        {
+                            Content = element.ToString(),
+                            Margin = new Thickness(10, 0, 0, 0)
+                        });
+
+                        Button buttonInner = new Button()
+                        {
+                            FontSize = 12,
+                            FontWeight = FontWeights.Bold,
+                            Background = Brushes.Transparent,
+                            BorderThickness = new Thickness(0),
+                            Content = "(изменить)",
+                            Tag = group.ElementName + "." + element.ToString(),
+                        };
+
+                        buttonInner.Click += ButtonEdit;
+                        stackPanelInner.Children.Add(buttonInner);
+                        stackPanelMain.Children.Add(stackPanelInner);
 
                         tagAndElements[group.ElementName].Add(element.ToString());
 
-                    }                    
+                    }
 
-                    listBoxItemsList.Items.Add(listBox);
+                    stackPanelMain.Children.Add(new ListBoxItem
+                    {
+                        Content = $"<{group.ElementName.ToString()}>"
+                    });
+
+                    listBoxItemsList.Items.Add(stackPanelMain);
                 }
 
                 comboBoxTagDelete.ItemsSource = tagAndElements.Keys;
@@ -203,39 +234,65 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 string jsonText = File.ReadAllText(openFileDialog.FileName);
                 JObject json = JObject.Parse(jsonText);
 
-                foreach (var item in json)
+                foreach (var node in json)
                 {
-                    foreach(var ite in item.Value)
+                    foreach(var tag in node.Value)
                     {
-                        foreach(var it in ite)
+                        foreach(var item in tag)
                         {
-                            ListBox listBox = new ListBox()
+                            StackPanel stackPanelMain = new StackPanel()
                             {
-                                Background = Brushes.Transparent,
-                                BorderThickness = new Thickness(0)
+                                Orientation = Orientation.Vertical
                             };
 
-                            tagAndElements.Add(it.Path.ToString().Split('.')[1], new List<string>());
+                            tagAndElements.Add(item.Path.ToString().Split('.')[1], new List<string>());
 
-                            listBox.Items.Add(new ListBoxItem
+                            StackPanel stackPanelTag = new StackPanel()
                             {
-                                Content = it.Path.ToString().Split('.')[1],
-                                FontWeight = FontWeights.Bold
+                                Orientation = Orientation.Horizontal
+                            };
+
+                            stackPanelTag.Children.Add(new ListBoxItem
+                            {
+                                Content = $"\"{item.Path.ToString().Split('.')[1]}\":"
                             });
-                            foreach (var element in ite)
+
+                            stackPanelMain.Children.Add(stackPanelTag);
+
+                            foreach (var element in tag)
                             {
-                                foreach (var elem in element)
+                                foreach (var value in element)
                                 {
-                                    listBox.Items.Add(new ListBoxItem
+                                    StackPanel stackPanelInner = new StackPanel()
                                     {
-                                        Content = elem.ToString()
+                                        Orientation = Orientation.Horizontal
+                                    };
+
+                                    stackPanelInner.Children.Add(new ListBoxItem
+                                    {
+                                        Content = value.ToString(),
+                                        Margin = new Thickness(10, 0, 0, 0)
                                     });
 
-                                    tagAndElements[it.Path.ToString().Split('.')[1]].Add(elem.ToString());
+                                    Button buttonInner = new Button()
+                                    {
+                                        FontSize = 12,
+                                        FontWeight = FontWeights.Bold,
+                                        Background = Brushes.Transparent,
+                                        BorderThickness = new Thickness(0),
+                                        Content = "(изменить)",
+                                        Tag = item.Path.ToString().Split('.')[1] + "." + value.ToString()
+                                    };
+
+                                    buttonInner.Click += ButtonEdit;
+                                    stackPanelInner.Children.Add(buttonInner);
+                                    stackPanelMain.Children.Add(stackPanelInner);
+
+                                    tagAndElements[item.Path.ToString().Split('.')[1]].Add(value.ToString());
                                 }
                             }
 
-                            listBoxItemsList.Items.Add(listBox);
+                            listBoxItemsList.Items.Add(stackPanelMain);
                         }
                     }
                 }
@@ -279,9 +336,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                         XmlNode newTag = doc.CreateNode(XmlNodeType.Element, textBoxTagPost.Text, "");
                         rootNode.AppendChild(newTag);
-                        doc.Save(openFileDialog.FileName);
-
-                        textBoxTagPost.Text = null; 
+                        doc.Save(openFileDialog.FileName); 
                     }
                     else
                     {
@@ -292,6 +347,8 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                         File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
                     }
+
+                    textBoxTagPost.Text = null;
                 }
 
                 // Удаление тега
@@ -339,8 +396,6 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                             selectedElement.AppendChild(newElement);
                             doc.Save(openFileDialog.FileName);
                         }
-
-                        textBoxElementPost.Text = null; 
                     }
                     else
                     {
@@ -351,6 +406,8 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                         File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
                     }
+
+                    textBoxElementPost.Text = null;
                 }
 
                 // Удаление элемента из тега
@@ -381,14 +438,15 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                     }
                     else
                     {
+                        JObject jsonObject = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
+
+                        JObject parentNode = (JObject)jsonObject["Root"][comboBoxElementDeleteFrom.SelectedItem.ToString()];
+
                         string elementString = comboBoxElementDelete.SelectedItem.ToString();
                         int startIndex = elementString.IndexOf("\"") + 1;
                         int endIndex = elementString.IndexOf("\"", startIndex);
                         elementString = elementString.Substring(startIndex, endIndex - startIndex);
 
-                        JObject jsonObject = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
-
-                        JObject parentNode = (JObject)jsonObject["Root"][comboBoxElementDeleteFrom.SelectedItem.ToString()];
                         parentNode.Property(elementString).Remove();
 
                         File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
@@ -424,15 +482,79 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             buttonClear.IsEnabled = !string.IsNullOrWhiteSpace(textBoxTagPost.Text) || !string.IsNullOrWhiteSpace(textBoxElementPost.Text);
         }
 
-        // Редактирование элементов тега - НЕ СДЕЛАНО
+        // Редактирование элементов тега
         private void ButtonEdit(object sender, RoutedEventArgs e)
         {
             try
             {
-                // логика - можно сделать диалоговое окно
+                if (FileObject.fileType.Equals(".xml"))
+                {
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load(openFileDialog.FileName);
+                  
+                    Button button = (Button)sender;
+                    string nodeName = button.Tag.ToString();
 
-                InfoWindow infoWindow = new InfoWindow("Изменения успешно применены!", Brushes.LimeGreen);
-                infoWindow.ShowDialog();
+                    XmlNode root = doc.DocumentElement;
+
+                    XmlNode parentTag = root.SelectSingleNode(nodeName.Split('.')[0]);
+                    if (parentTag != null)
+                    {
+                        string elementString = nodeName.Split('.')[1];
+                        int startIndex = elementString.IndexOf("<") + 1;
+                        int endIndex = elementString.IndexOf(">", startIndex);
+                        elementString = elementString.Substring(startIndex, endIndex - startIndex);
+
+                        XmlNode elementToEdit = parentTag.SelectSingleNode(elementString);
+
+                        EditWindow editWindow = new EditWindow(elementToEdit);
+                        editWindow.ShowDialog();
+
+                        XmlNode elementNew = doc.CreateElement(elementString);
+                        elementNew.InnerText = editWindow.EditNode;
+                        parentTag.ReplaceChild(elementNew, elementToEdit);
+
+                        doc.Save(openFileDialog.FileName);
+
+                        InfoWindow infoWindow = new InfoWindow("Изменения успешно применены!", Brushes.LimeGreen);
+                        infoWindow.ShowDialog();
+                    }                                     
+
+                    LoadXml();
+                }
+                else
+                {
+                    JObject jsonObject = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
+
+                    Button button = (Button)sender;
+                    string nodeName = button.Tag.ToString();
+
+                    JToken root = jsonObject.SelectToken("Root");
+
+                    JToken parentTag = root.SelectToken(nodeName.Split('.')[0]);
+                    if (parentTag != null)
+                    {
+                        string elementString = nodeName.Split('.')[1];
+                        int startIndex = elementString.IndexOf("\"") + 1;
+                        int endIndex = elementString.IndexOf("\"", startIndex);
+                        elementString = elementString.Substring(startIndex, endIndex - startIndex);
+
+                        JToken elementToEdit = parentTag.SelectToken(elementString);
+
+                        EditWindow editWindow = new EditWindow(elementToEdit.ToString());
+                        editWindow.ShowDialog();
+
+                        JValue elementNew = new JValue(editWindow.EditNode);
+                        parentTag[elementString] = elementNew;
+
+                        File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
+
+                        InfoWindow infoWindow = new InfoWindow("Изменения успешно применены!", Brushes.LimeGreen);
+                        infoWindow.ShowDialog();
+                    }
+
+                    LoadJson();
+                }
             }
             catch (Exception ex)
             {

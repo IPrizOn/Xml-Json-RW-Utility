@@ -13,6 +13,7 @@
   <ItemGroup>
     <None Remove="Resources\appIcon.ico" />
     <None Remove="Resources\icTransfer.ico" />
+    <None Remove="Resources\images\appImage.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,10 @@
 
   <ItemGroup>
     <Content Include="Resources\icons\appIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\images\appImage.png" />
   </ItemGroup>
 
 </Project>
