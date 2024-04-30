@@ -43,7 +43,7 @@
         </Border>
 
         <Border Margin="5,2.5,5,5" CornerRadius="15"  Grid.Row="1">
-            <Button Background="White" Height="30" Width="120" Click="ButtonOK" FontSize="14" Content="ОК"/>
+            <Button Background="White" Height="30" Width="120" Click="ButtonOK_Click" FontSize="14" Content="ОК"/>
         </Border>
     </Grid>
 </Window>

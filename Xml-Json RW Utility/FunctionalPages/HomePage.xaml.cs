@@ -7,35 +7,36 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 {
     public partial class HomePage : Page
     {
+        // Начальная страница программы
         public HomePage(string fileType)
         {
             InitializeComponent();
 
-            // Определение оформления
+            // Определение типа файла для работы и соответствующего оформления окна для него
             FileObject.fileType = fileType;
             if (FileObject.fileType.Equals(".xml"))
             {
-                DockPanel.SetDock(btnSwitchType, Dock.Left);
-                btnSwitchType.Background = Brushes.PaleGreen;
+                DockPanel.SetDock(buttonSwitchType, Dock.Left);
+                buttonSwitchType.Background = Brushes.PaleGreen;
                 borderUI.Background = Brushes.PaleGreen;
-                btnTextTransfer.Content = "xml в json";        
+                buttonToTransfer.Content = "xml в json";        
             }
             else
             {
-                DockPanel.SetDock(btnSwitchType, Dock.Right);
-                btnSwitchType.Background = Brushes.Gold;
+                DockPanel.SetDock(buttonSwitchType, Dock.Right);
+                buttonSwitchType.Background = Brushes.Gold;
                 borderUI.Background = Brushes.Gold;
-                btnTextTransfer.Content = "json в xml";
+                buttonToTransfer.Content = "json в xml";
             }
         }
 
         // На страницу Чтения/Записи
-        private void ButtonToWrite(object sender, System.Windows.RoutedEventArgs e)
+        private void ButtonToWriteRead(object sender, System.Windows.RoutedEventArgs e)
         {
             HomeObjects.frameHome.Navigate(new WritePage(FileObject.fileType));
         }
 
-        // Диалоговое окно перевода
+        // Диалоговое окно конвертации
         private void ButtonToTransfer(object sender, System.Windows.RoutedEventArgs e)
         {
             TransferWindow transferWindow = new TransferWindow(FileObject.fileType);
@@ -45,23 +46,23 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         // Переключение на работу с Json
         private void ButtonSwitcher_Checked(object sender, System.Windows.RoutedEventArgs e)
         {
-            DockPanel.SetDock(btnSwitchType, Dock.Right);
+            DockPanel.SetDock(buttonSwitchType, Dock.Right);
             FileObject.fileType = ".json";
-            btnSwitchType.Background = Brushes.Gold;
+            buttonSwitchType.Background = Brushes.Gold;
             borderUI.Background = Brushes.Gold;
             HomeObjects.labelHome.Foreground = Brushes.Gold;
-            btnTextTransfer.Content = "json в xml";
+            buttonToTransfer.Content = "json в xml";
         }
 
         // Переключение на работу с Xml
         private void ButtonSwitcher_Unchecked(object sender, System.Windows.RoutedEventArgs e)
         {
-            DockPanel.SetDock(btnSwitchType, Dock.Left);
+            DockPanel.SetDock(buttonSwitchType, Dock.Left);
             FileObject.fileType = ".xml";
-            btnSwitchType.Background = Brushes.PaleGreen;
+            buttonSwitchType.Background = Brushes.PaleGreen;
             borderUI.Background = Brushes.PaleGreen;
             HomeObjects.labelHome.Foreground = Brushes.PaleGreen;
-            btnTextTransfer.Content = "xml в json";
+            buttonToTransfer.Content = "xml в json";
         }
     }
 }

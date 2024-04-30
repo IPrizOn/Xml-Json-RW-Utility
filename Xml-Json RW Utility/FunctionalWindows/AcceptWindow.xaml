@@ -44,8 +44,8 @@
 
         <Border Margin="5,2.5,5,5" CornerRadius="15"  Grid.Row="1">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Background="White" Foreground="Firebrick" Height="30" Width="120" Click="ButtonNo" FontSize="14" Content="Нет" Margin="0,0,25,0"/>
-                <Button Background="White" Foreground="LimeGreen" Height="30" Width="120" Click="ButtonYes" FontSize="14" Content="Да" Margin="25,0,0,0"/>
+                <Button x:Name="buttonNo" Background="White" Foreground="Firebrick" Height="30" Width="120" Click="ButtonNo_CLick" FontSize="14" Content="Нет" Margin="0,0,25,0"/>
+                <Button x:Name="buttonYes" Background="White" Foreground="LimeGreen" Height="30" Width="120" Click="ButtonYes_Click" FontSize="14" Content="Да" Margin="25,0,0,0"/>
             </StackPanel>
         </Border>
     </Grid>

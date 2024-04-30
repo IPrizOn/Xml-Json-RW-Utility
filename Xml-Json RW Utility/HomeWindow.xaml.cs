@@ -7,11 +7,12 @@ namespace Xml_Json_RW_Utility
 {
     public partial class HomeWindow : Window
     {
+        // Главное окно программы, в котором размещается контент в виде страниц
         public HomeWindow()
         {
             InitializeComponent();
 
-            // Задание начального окна и оформления для него
+            // Задание начальной страницы и оформления для неё
             HomeObjects.frameHome = frmHome;
             frmHome.Navigate(new HomePage(FileObject.fileType));
 
@@ -19,8 +20,8 @@ namespace Xml_Json_RW_Utility
             lbHome.Foreground = Brushes.PaleGreen;
         }
 
-        // Выход из приложения
-        private void Button_Click(object sender, RoutedEventArgs e)
+        // Завершение программы
+        private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }

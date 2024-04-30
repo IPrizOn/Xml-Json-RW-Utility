@@ -44,8 +44,8 @@
 
         <Border Background="DarkGray" CornerRadius="15" Margin="10, 10, 5, 5">
             <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                <Label x:Name="labelWrite" Content="Чтение/Запись" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"/>
-                <Button x:Name="buttonSelectFile" Style="{StaticResource default}" Click="ButtonSelectFile" Height="30" Width="125" Content="Выбрать файл"/>
+                <Label x:Name="labelWriteRead" Content="Чтение/Запись" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"/>
+                <Button x:Name="buttonSelectFile" Style="{StaticResource default}" Click="ButtonSelectFile_Click" Height="30" Width="125" Content="Выбрать файл"/>
                 <Label x:Name="labelFileName" Content="" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5"/>
             </StackPanel>
         </Border>
@@ -56,7 +56,7 @@
                 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,5,5,0">
                     <Label FontSize="16" Content="Добавить тег" Margin="5,0,5,0"/>
-                    <TextBox x:Name="textBoxTagPost" TextChanged="TextBox_TextChanged" MinWidth="80" MaxWidth="160" MaxHeight="26" FontSize="16" Margin="5,0,5,0"/>
+                    <TextBox x:Name="textBoxTagPost" TextChanged="TextBoxPost_TextChanged" MinWidth="80" MaxWidth="160" MaxHeight="26" FontSize="16" Margin="5,0,5,0"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,0,5,5">
                     <Label FontSize="16" Content="Удалить тег" Margin="5,0,5,0"/>
@@ -71,7 +71,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="25,0,5,5" HorizontalAlignment="Center">
                     <Label x:Name="labelElementPost" FontSize="16" Content="элемент" Margin="5,0,5,0"/>
-                    <TextBox x:Name="textBoxElementPost" TextChanged="TextBox_TextChanged" MinWidth="80" MaxWidth="160" MaxHeight="26" FontSize="16" Margin="5,0,5,0"/>
+                    <TextBox x:Name="textBoxElementPost" TextChanged="TextBoxPost_TextChanged" MinWidth="80" MaxWidth="160" MaxHeight="26" FontSize="16" Margin="5,0,5,0"/>
                 </StackPanel>
 
                 <Border BorderThickness="0.5" BorderBrush="Gray" Margin="20,0,20,0"/>
@@ -87,12 +87,12 @@
 
                 <Border BorderThickness="0.5" BorderBrush="Gray" Margin="20,0,20,0"/>
 
-                <Button x:Name="buttonAcceptChanges" Style="{StaticResource default}" IsEnabled="False" FontSize="16" Height="35" Width="190" Content="Применить изменения" Click="ButtonAcceptChanges" Margin="0,10,0,5"/>
+                <Button x:Name="buttonAcceptChanges" Style="{StaticResource default}" IsEnabled="False" FontSize="16" Height="35" Width="190" Content="Применить изменения" Click="ButtonAcceptChanges_Click" Margin="0,10,0,5"/>
             </StackPanel>
         </Border>
 
-        <Button x:Name="buttonBack" Style="{StaticResource default}" HorizontalAlignment="Left" Width="150" Click="ButtonBack" Background="White" FontSize="16" FontWeight="Bold" Content="Назад" Margin="10,5,5,10" Grid.Row="2"/>
-        <Button x:Name="buttonClear" Style="{StaticResource default}" IsEnabled="False" HorizontalAlignment="Right" Foreground="Firebrick" Width="150" Click="ButtonClear" Background="White" FontSize="16" FontWeight="Bold" Content="Сбросить" Margin="5,5,5,10" Grid.Row="2"/>
+        <Button x:Name="buttonBack" Style="{StaticResource default}" HorizontalAlignment="Left" Width="150" Click="ButtonBack_Click" Background="White" FontSize="16" FontWeight="Bold" Content="Назад" Margin="10,5,5,10" Grid.Row="2"/>
+        <Button x:Name="buttonClear" Style="{StaticResource default}" IsEnabled="False" HorizontalAlignment="Right" Foreground="Firebrick" Width="150" Click="ButtonClear_Click" Background="White" FontSize="16" FontWeight="Bold" Content="Сбросить" Margin="5,5,5,10" Grid.Row="2"/>
 
         <Border x:Name="borderFileInfo" Background="LightGray" BorderThickness="1" BorderBrush="DarkGray" CornerRadius="15" Margin="5,10,10,10" Grid.Column="1" Grid.RowSpan="3">
             <ListBox x:Name="listBoxItemsList" BorderThickness="1" Background="Transparent" Margin="15,15,15,15" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible"/>

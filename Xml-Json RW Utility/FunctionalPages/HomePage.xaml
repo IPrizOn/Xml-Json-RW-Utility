@@ -156,12 +156,12 @@
                 <ToggleButton Style="{DynamicResource ToggleButtonStyle1}" BorderBrush="Black" Background="White" Height="40" Width="120" Checked="ButtonSwitcher_Checked" Unchecked="ButtonSwitcher_Unchecked">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="40" Width="120">
                         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Center" Height="40" Width="110" LastChildFill="False">
-                            <ToggleButton x:Name="btnSwitchType" Style="{DynamicResource ToggleButtonStyle2}" Height="30" Width="30" DockPanel.Dock="Left" Background="PaleGreen" BorderBrush="Black"/>
+                            <ToggleButton x:Name="buttonSwitchType" Style="{DynamicResource ToggleButtonStyle2}" Height="30" Width="30" DockPanel.Dock="Left" Background="PaleGreen" BorderBrush="Black"/>
                         </DockPanel>
                     </Grid>
                 </ToggleButton>
-                <Button HorizontalAlignment="Center" Content="Чтение/Запись" Click="ButtonToWrite" Margin="0,75,0,20"/>
-                <Button x:Name="btnTextTransfer" HorizontalAlignment="Center" Width="100" Height="30" Content="xml в json" Click="ButtonToTransfer" Margin="0,5,0,25"/>
+                <Button x:Name="buttonToWriteRead" HorizontalAlignment="Center" Content="Чтение/Запись" Click="ButtonToWriteRead" Margin="0,75,0,20"/>
+                <Button x:Name="buttonToTransfer" HorizontalAlignment="Center" Width="100" Height="30" Content="xml в json" Click="ButtonToTransfer" Margin="0,5,0,25"/>
             </StackPanel>
         </Border>
     </Grid>

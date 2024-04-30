@@ -12,8 +12,6 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
     public partial class TransferWindow : Window
     {
         private OpenFileDialog openFileDialog;
-        private string filePath;
-        private string fileName;
 
         public TransferWindow(string fileType)
         {
@@ -25,41 +23,39 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
             FileObject.fileType = fileType;
             if (FileObject.fileType.Equals(".xml"))
             {
-                btnSelectFile.Background = Brushes.PaleGreen;
-                labelTypeTransfer.Content = "Выберите xml файл для перевода";
+                buttonSelectFile.Background = Brushes.PaleGreen;
+                labelTypeTransfer.Content = "Выберите xml файл для конвертации";
                 openFileDialog.Filter = "XML Files (*.xml)|*.xml";
             }
             else
             {
-                btnSelectFile.Background = Brushes.Gold;
-                labelTypeTransfer.Content = "Выберите json файл для перевода";
+                buttonSelectFile.Background = Brushes.Gold;
+                labelTypeTransfer.Content = "Выберите json файл для конвертации";
                 openFileDialog.Filter = "JSON Files (*.json)|*.json";
             }
         }
 
-        // Окно выбора файла
-        private void ButtonSelectFile(object sender, RoutedEventArgs e)
+        // Окно выбора файла и отображение его имени
+        private void ButtonSelectFile_Click(object sender, RoutedEventArgs e)
         {
-            // Отображение окна выбора файла и названия файла
             if (openFileDialog.ShowDialog() == true)
             {
-                fileName = openFileDialog.SafeFileName;
                 if(FileObject.fileType.Equals(".xml"))
                 {
-                    labelFileName.Content = fileName.Replace(".xml", "");
+                    labelFileName.Content = openFileDialog.SafeFileName.Replace(".xml", "");
                     labelFileName.Foreground = Brushes.PaleGreen;
                 }
                 else
                 {
-                    labelFileName.Content = fileName.Replace(".json", "");
+                    labelFileName.Content = openFileDialog.SafeFileName.Replace(".json", "");
                     labelFileName.Foreground = Brushes.Gold;
                 }
-                btnAccept.IsEnabled = true;
+                buttonAccept.IsEnabled = true;
             }
         }
 
         // Подтверждение и выбор перевода файла
-        private void ButtonConfirm(object sender, RoutedEventArgs e)
+        private void ButtonConfirm_Click(object sender, RoutedEventArgs e)
         {
             if (FileObject.fileType.Equals(".xml"))
             {
@@ -76,13 +72,11 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
         {
             try
             {
-                filePath = openFileDialog.FileName;
-
-                string json = File.ReadAllText(filePath);
+                string json = File.ReadAllText(openFileDialog.FileName);
 
                 XmlDocument doc = JsonConvert.DeserializeXmlNode(json, "Root");
 
-                string xmlFilePath = Path.ChangeExtension(filePath, ".xml");
+                string xmlFilePath = Path.ChangeExtension(openFileDialog.FileName, ".xml");
                 doc.Save(xmlFilePath);
 
                 XDocument xdoc = XDocument.Load(xmlFilePath);
@@ -92,7 +86,7 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
 
                 xdoc.Save(xmlFilePath);
 
-                File.Delete(filePath);
+                File.Delete(openFileDialog.FileName);
             }
             catch (ArgumentException ex)
             {
@@ -114,19 +108,17 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
         {
             try
             {
-                filePath = openFileDialog.FileName;
-
-                XDocument xml = XDocument.Load(filePath);
+                XDocument xml = XDocument.Load(openFileDialog.FileName);
 
                 XDocument cleanedXml = new XDocument(xml.Root);
                 string cleanedXmlString = cleanedXml.ToString(SaveOptions.DisableFormatting);
 
                 string json = JsonConvert.SerializeXNode(XDocument.Parse(cleanedXmlString));
 
-                string jsonFilePath = Path.ChangeExtension(filePath, ".json");
+                string jsonFilePath = Path.ChangeExtension(openFileDialog.FileName, ".json");
                 File.WriteAllText(jsonFilePath, json);
 
-                File.Delete(filePath);
+                File.Delete(openFileDialog.FileName);
             }
             catch (ArgumentException ex)
             {

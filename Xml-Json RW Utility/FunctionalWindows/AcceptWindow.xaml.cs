@@ -6,22 +6,26 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
 {
     public partial class AcceptWindow : Window
     {
+        // Диалоговое окно подтверждения изменений
         public AcceptWindow(string message, SolidColorBrush colorBrush)
         {
             InitializeComponent();
 
+            // Отобржаение подтверждения в окне и соответствующего для неё цвета
             labelMessageText.Text = message;
             borderMessage.Background = colorBrush;
         }
 
-        private void ButtonNo(object sender, RoutedEventArgs e)
+        // Отмена изменений
+        private void ButtonNo_CLick(object sender, RoutedEventArgs e)
         {
             MessageBoxObject.resultMessage = MessageBoxResult.No;
 
             this.Close();
         }
 
-        private void ButtonYes(object sender, RoutedEventArgs e)
+        // Применение изменений
+        private void ButtonYes_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxObject.resultMessage = MessageBoxResult.Yes;
 

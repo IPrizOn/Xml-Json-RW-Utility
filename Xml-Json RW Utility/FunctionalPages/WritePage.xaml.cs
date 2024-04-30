@@ -16,6 +16,12 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         private OpenFileDialog openFileDialog;
         private Dictionary<string, List<string>> tagAndElements;
 
+        private XmlDocument savedXmlDocument = new XmlDocument();
+        private string savedXmlPath;
+        private JObject savedJsonDocument = new JObject();
+        private string savedJsonPath;
+
+        // Страница чтения/записи
         public WritePage(string fileType)
         {
             InitializeComponent();
@@ -23,12 +29,12 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             openFileDialog = new OpenFileDialog();
             tagAndElements = new Dictionary<string, List<string>>();
 
-            // Определение типа файла для работы и соответствующего оформления для него
+            // Определение типа файла для работы и соответствующего оформления окна для него
             FileObject.fileType = fileType;
             if (FileObject.fileType.Equals(".xml"))
             {
                 openFileDialog.Filter = "XML Files (*.xml)|*.xml";
-                labelWrite.Content += " XML";
+                labelWriteRead.Content += " XML";
                 borderFileInfo.Background = Brushes.PaleGreen;
                 buttonSelectFile.Background = Brushes.PaleGreen;
                 buttonAcceptChanges.Background = Brushes.PaleGreen;
@@ -37,7 +43,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             else
             {
                 openFileDialog.Filter = "JSON Files (*.json)|*.json";
-                labelWrite.Content += " JSON";
+                labelWriteRead.Content += " JSON";
                 borderFileInfo.Background = Brushes.Gold;
                 buttonSelectFile.Background = Brushes.Gold;
                 buttonAcceptChanges.Background = Brushes.Gold;
@@ -46,7 +52,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         }
 
         // Возврат на главную
-        private void ButtonBack(object sender, RoutedEventArgs e)
+        private void ButtonBack_Click(object sender, RoutedEventArgs e)
         {
             HomeObjects.frameHome.Navigate(new HomePage(FileObject.fileType));
             if(FileObject.fileType.Equals(".xml"))
@@ -59,16 +65,51 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             }
         }
 
-        // Сброс информации на странице
-        private void ButtonClear(object sender, RoutedEventArgs e)
+        // Сброс информации в файле, если были изменения
+        private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
             AcceptWindow acceptWindow = new AcceptWindow("Вы уверены, что хотите сбросить?", Brushes.Orange);
             acceptWindow.ShowDialog();
 
             if (MessageBoxObject.resultMessage == MessageBoxResult.Yes)
             {
-                ClearAll();
+                if (FileObject.fileType.Equals(".xml"))
+                {
+                    try
+                    {
+                        savedXmlDocument.Save(savedXmlPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        InfoWindow infoWindowError = new InfoWindow("Не удалось сбросить изменения.", Brushes.Firebrick);
+                        infoWindowError.ShowDialog();
+
+                        Console.WriteLine(ex.Message);
+                    }
+
+                    LoadXml();
+                }
+                else
+                {
+                    try
+                    {
+                        File.WriteAllText(savedJsonPath, savedJsonDocument.ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        InfoWindow infoWindowError = new InfoWindow("Не удалось сбросить изменения.", Brushes.Firebrick);
+                        infoWindowError.ShowDialog();
+
+                        Console.WriteLine(ex.Message);
+                    }
+
+                    LoadJson();
+                }
+
+                textBoxTagPost.Text = null;
+                textBoxElementPost.Text = null;
                 buttonClear.IsEnabled = false;
+                buttonAcceptChanges.IsEnabled = false;
 
                 InfoWindow infoWindow = new InfoWindow("Информация успешно сброшена!", Brushes.LimeGreen);
                 infoWindow.ShowDialog();
@@ -77,33 +118,39 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             MessageBoxObject.resultMessage = MessageBoxResult.No;
         }
 
-        // Очистка всего содержимого на странице
+        // Очистка содержимого всех полей на странице
         private void ClearAll()
         {
             openFileDialog.FileName = "";
             labelFileName.Content = "";
-            textBoxTagPost.Text = "";
-            textBoxElementPost.Text = "";
+            textBoxTagPost.Text = null;
+            textBoxElementPost.Text = null;
             listBoxItemsList.Items.Clear();
             tagAndElements.Clear();
             comboBoxElementPostIn.ItemsSource = null;
             comboBoxTagDelete.ItemsSource = null;
             comboBoxElementDeleteFrom.ItemsSource = null;
-            comboBoxElementDelete.Items.Clear();
+            comboBoxElementDelete.Items.Clear();          
         }
 
         // Окно выбора файла и логика его загрузки
-        private void ButtonSelectFile(object sender, RoutedEventArgs e)
+        private void ButtonSelectFile_Click(object sender, RoutedEventArgs e)
         {
             if (openFileDialog.ShowDialog() == true)
             {
                 if (FileObject.fileType.Equals(".xml"))
                 {
                     labelFileName.Content = openFileDialog.SafeFileName.Replace(".xml", "");
+
+                    savedXmlDocument.Load(openFileDialog.FileName);
+                    savedXmlPath = openFileDialog.FileName;
                 }
                 else
                 {
                     labelFileName.Content = openFileDialog.SafeFileName.Replace(".json", "");
+
+                    savedJsonDocument = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
+                    savedJsonPath = openFileDialog.FileName;
                 }
             }
 
@@ -180,7 +227,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                             Tag = group.ElementName + "." + element.ToString(),
                         };
 
-                        buttonInner.Click += ButtonEdit;
+                        buttonInner.Click += ButtonEdit_Click;
                         stackPanelInner.Children.Add(buttonInner);
                         stackPanelMain.Children.Add(stackPanelInner);
 
@@ -199,8 +246,6 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 comboBoxTagDelete.ItemsSource = tagAndElements.Keys;
                 comboBoxElementPostIn.ItemsSource = tagAndElements.Keys;
                 comboBoxElementDeleteFrom.ItemsSource = tagAndElements.Keys;
-
-                buttonClear.IsEnabled = true;
             }
             catch (ArgumentException ex)
             {
@@ -229,7 +274,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 comboBoxTagDelete.ItemsSource = null;
                 comboBoxElementDeleteFrom.ItemsSource = null;
                 comboBoxElementDelete.Items.Clear();
-                tagAndElements.Clear();
+                tagAndElements.Clear();               
 
                 string jsonText = File.ReadAllText(openFileDialog.FileName);
                 JObject json = JObject.Parse(jsonText);
@@ -284,7 +329,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                                         Tag = item.Path.ToString().Split('.')[1] + "." + value.ToString()
                                     };
 
-                                    buttonInner.Click += ButtonEdit;
+                                    buttonInner.Click += ButtonEdit_Click;
                                     stackPanelInner.Children.Add(buttonInner);
                                     stackPanelMain.Children.Add(stackPanelInner);
 
@@ -300,8 +345,6 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 comboBoxTagDelete.ItemsSource = tagAndElements.Keys;
                 comboBoxElementPostIn.ItemsSource = tagAndElements.Keys;
                 comboBoxElementDeleteFrom.ItemsSource = tagAndElements.Keys;
-
-                buttonClear.IsEnabled = true;
             }
             catch(ArgumentException ex)
             {
@@ -321,7 +364,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         }
 
         // Применение изменений в файле
-        private void ButtonAcceptChanges(object sender, RoutedEventArgs e)
+        private void ButtonAcceptChanges_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -453,7 +496,8 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                     }
                 }
 
-                // Обновление информации
+
+                // Обновление информации на странице после изменений
                 if (FileObject.fileType.Equals(".xml"))
                 {
                     LoadXml();
@@ -462,6 +506,8 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 {
                     LoadJson();
                 }
+
+                buttonClear.IsEnabled = true;
 
                 InfoWindow infoWindow = new InfoWindow("Изменения успешно применены!", Brushes.LimeGreen);
                 infoWindow.ShowDialog();
@@ -473,17 +519,10 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                 Console.WriteLine(ex.Message);
             }           
-        }
-        
-        // Разблокировка кнопок, если написан контент в TextBox'ах
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            buttonAcceptChanges.IsEnabled = !string.IsNullOrWhiteSpace(textBoxTagPost.Text) || !string.IsNullOrWhiteSpace(textBoxElementPost.Text);
-            buttonClear.IsEnabled = !string.IsNullOrWhiteSpace(textBoxTagPost.Text) || !string.IsNullOrWhiteSpace(textBoxElementPost.Text);
-        }
+        }      
 
         // Редактирование элементов тега
-        private void ButtonEdit(object sender, RoutedEventArgs e)
+        private void ButtonEdit_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -507,7 +546,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                         XmlNode elementToEdit = parentTag.SelectSingleNode(elementString);
 
-                        EditWindow editWindow = new EditWindow(elementToEdit);
+                        EditWindow editWindow = new EditWindow(elementToEdit, elementString);
                         editWindow.ShowDialog();
 
                         XmlNode elementNew = doc.CreateElement(elementString);
@@ -515,9 +554,6 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                         parentTag.ReplaceChild(elementNew, elementToEdit);
 
                         doc.Save(openFileDialog.FileName);
-
-                        InfoWindow infoWindow = new InfoWindow("Изменения успешно применены!", Brushes.LimeGreen);
-                        infoWindow.ShowDialog();
                     }                                     
 
                     LoadXml();
@@ -541,20 +577,19 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                         JToken elementToEdit = parentTag.SelectToken(elementString);
 
-                        EditWindow editWindow = new EditWindow(elementToEdit.ToString());
+                        EditWindow editWindow = new EditWindow(elementToEdit.ToString(), elementString);
                         editWindow.ShowDialog();
 
                         JValue elementNew = new JValue(editWindow.EditNode);
                         parentTag[elementString] = elementNew;
 
                         File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
-
-                        InfoWindow infoWindow = new InfoWindow("Изменения успешно применены!", Brushes.LimeGreen);
-                        infoWindow.ShowDialog();
                     }
 
                     LoadJson();
                 }
+
+                buttonClear.IsEnabled = true;
             }
             catch (Exception ex)
             {
@@ -565,14 +600,19 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             }
         }
 
-        // Разблокировка кнопок, если выбран контент в ComboBox'ах
+        // Разблокировка кнопки применения изменений, если написан контент в TextBox'ах
+        private void TextBoxPost_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            buttonAcceptChanges.IsEnabled = (!string.IsNullOrWhiteSpace(textBoxTagPost.Text) || !string.IsNullOrWhiteSpace(textBoxElementPost.Text)) && !string.IsNullOrWhiteSpace(labelFileName.Content.ToString());
+        }
+
+        // Разблокировка кнопки применения изменений, если выбран контент в ComboBox'ах
         private void ComboBoxes_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             buttonAcceptChanges.IsEnabled = true;
-            buttonClear.IsEnabled = true;
         }
 
-        // Отображение подкатегорий элемента из ComboBoxElementDeleteFrom
+        // Отображение подкатегорий после выбора категории в ComboBox для удаление элемента из тега
         private void ComboBoxElementDeleteFrom_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             comboBoxElementDelete.Items.Clear();
@@ -586,7 +626,6 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             }
 
             buttonAcceptChanges.IsEnabled = true;
-            buttonClear.IsEnabled = true;
         }
     }
 }

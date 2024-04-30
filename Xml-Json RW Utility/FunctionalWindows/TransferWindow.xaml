@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Xml_Json_RW_Utility.FunctionalPages"
         mc:Ignorable="d"
-        Title="Окно перевода" MaxHeight="160" MaxWidth="360" MinHeight="160" MinWidth="360" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen">
+        Title="Окно конвертации" MaxHeight="160" MaxWidth="360" MinHeight="160" MinWidth="360" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Style TargetType="Button">
@@ -37,13 +37,13 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Label x:Name="labelTypeTransfer" FontSize="16" FontWeight="Bold" Content="Выберите файл для перевода"/>
+            <Label x:Name="labelTypeTransfer" FontSize="16" FontWeight="Bold" Content="Выберите файл для конвертации"/>
             <Label x:Name="labelFileName" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Content=""/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
-            <Button x:Name="btnSelectFile" Background="LightGray" Height="30" Width="120" Click="ButtonSelectFile" FontSize="14" Content="Выбрать файл" Margin="0,0,10,0"/>
-            <Button x:Name="btnAccept" IsEnabled="False" Background="White" Height="30" Width="120" Click="ButtonConfirm" FontSize="14" Content="Подтвердить" Margin="10,0,0,0"/>
+            <Button x:Name="buttonSelectFile" Background="LightGray" Height="30" Width="120" Click="ButtonSelectFile_Click" FontSize="14" Content="Выбрать файл" Margin="0,0,10,0"/>
+            <Button x:Name="buttonAccept" IsEnabled="False" Background="White" Height="30" Width="120" Click="ButtonConfirm_Click" FontSize="14" Content="Подтвердить" Margin="10,0,0,0"/>
         </StackPanel>
     </Grid>
 </Window>
