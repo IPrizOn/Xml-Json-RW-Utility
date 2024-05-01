@@ -26,6 +26,7 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
         {
             InitializeComponent();
 
+            // Отображение изменяемого элемента и соответствующего для него цвета
             labelElementName.Foreground = Brushes.Gold; 
             labelElementName.Text = tag;
 

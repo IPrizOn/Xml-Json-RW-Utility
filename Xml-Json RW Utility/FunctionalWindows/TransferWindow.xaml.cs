@@ -13,6 +13,7 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
     {
         private OpenFileDialog openFileDialog;
 
+        // Диалоговое окно конвертации файла
         public TransferWindow(string fileType)
         {
             InitializeComponent();

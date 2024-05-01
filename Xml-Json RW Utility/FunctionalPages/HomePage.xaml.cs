@@ -43,7 +43,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             transferWindow.ShowDialog();
         }     
 
-        // Переключение на работу с Json
+        // Переключение на работу с JSON
         private void ButtonSwitcher_Checked(object sender, System.Windows.RoutedEventArgs e)
         {
             DockPanel.SetDock(buttonSwitchType, Dock.Right);
@@ -54,7 +54,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             buttonToTransfer.Content = "json в xml";
         }
 
-        // Переключение на работу с Xml
+        // Переключение на работу с XML
         private void ButtonSwitcher_Unchecked(object sender, System.Windows.RoutedEventArgs e)
         {
             DockPanel.SetDock(buttonSwitchType, Dock.Left);

@@ -16,9 +16,9 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         private OpenFileDialog openFileDialog;
         private Dictionary<string, List<string>> tagAndElements;
 
-        private XmlDocument savedXmlDocument = new XmlDocument();
+        private XmlDocument savedXmlDocument;
         private string savedXmlPath;
-        private JObject savedJsonDocument = new JObject();
+        private JObject savedJsonDocument;
         private string savedJsonPath;
 
         // Страница чтения/записи
@@ -28,6 +28,9 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
             openFileDialog = new OpenFileDialog();
             tagAndElements = new Dictionary<string, List<string>>();
+
+            savedXmlDocument = new XmlDocument();
+            savedJsonDocument = new JObject();
 
             // Определение типа файла для работы и соответствующего оформления окна для него
             FileObject.fileType = fileType;
@@ -164,7 +167,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             }
         }
 
-        // Загрузка Xml файла
+        // Загрузка XML файла
         private void LoadXml()
         {
             try
@@ -264,7 +267,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             }
         }       
 
-        // Загрузка Json файла
+        // Загрузка JSON файла
         private void LoadJson()
         {
             try
