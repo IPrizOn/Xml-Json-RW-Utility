@@ -1,0 +1,46 @@
+﻿<Root>
+  <Data>
+    <Name>John</Name>
+    <Age>30</Age>
+    <Email>john@example.com</Email>
+  </Data>
+	
+  <Connections>
+    <ConnectionString>database=server1;userId=testuser;password=testpassword;security=true;</ConnectionString>
+  </Connections>
+	
+  <Account>
+    <Login>user1</Login>
+    <Password>qwerty12345</Password>
+  </Account>
+	
+  <Data2>
+    <Name>John</Name>
+    <Age>30</Age>
+    <Email>john@example.com</Email>
+  </Data2>
+	
+  <Connections2>
+    <ConnectionString>database=server1;userId=testuser;password=testpassword;security=true;</ConnectionString>
+  </Connections2>
+	
+  <Account2>
+    <Login>user1</Login>
+    <Password>qwerty12345</Password>
+  </Account2>
+	
+  <Data3>
+    <Name>John</Name>
+    <Age>30</Age>
+    <Email>john@example.com</Email>
+  </Data3>
+	
+  <Connections3>
+    <ConnectionString>database=server1;userId=testuser;password=testpassword;security=true;</ConnectionString>
+  </Connections3>
+	
+  <Account3>
+    <Login>user1</Login>
+    <Password>qwerty12345</Password>
+  </Account3>
+</Root>

@@ -1,0 +1,48 @@
+{
+  "Root": {
+    "Data": {
+      "Name": "John",
+      "Age": "30",
+      "Email": "john@example.com"
+    },
+
+    "Connections": {
+      "ConnectionString": "database=server1;userId=testuser;password=testpassword;security=true;"
+    },
+
+    "Account": {
+      "Login": "user1",
+      "Password": "qwerty12345"
+    },
+
+    "Data2": {
+      "Name": "John",
+      "Age": "30",
+      "Email": "john@example.com"
+    },
+
+    "Connections2": {
+      "ConnectionString": "database=server1;userId=testuser;password=testpassword;security=true;"
+    },
+
+    "Account2": {
+      "Login": "user1",
+      "Password": "qwerty12345"
+    },
+
+    "Data3": {
+      "Name": "John",
+      "Age": "30",
+      "Email": "john@example.com"
+    },
+
+    "Connections3": {
+      "ConnectionString": "database=server1;userId=testuser;password=testpassword;security=true;"
+    },
+
+    "Account3": {
+      "Login": "user1",
+      "Password": "qwerty12345"
+    }
+  }
+}
