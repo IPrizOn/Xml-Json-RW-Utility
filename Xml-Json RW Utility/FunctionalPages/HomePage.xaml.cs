@@ -33,7 +33,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         // На страницу Чтения/Записи
         private void ButtonToWriteRead(object sender, System.Windows.RoutedEventArgs e)
         {
-            HomeObjects.frameHome.Navigate(new WritePage(FileObject.fileType));
+            HomeObjects.frameHome.Navigate(new WriteReadPage(FileObject.fileType));
         }
 
         // Диалоговое окно конвертации

@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <None Remove="Resources\appIcon.ico" />
-    <None Remove="Resources\icTransfer.ico" />
     <None Remove="Resources\images\appImage.png" />
   </ItemGroup>
 

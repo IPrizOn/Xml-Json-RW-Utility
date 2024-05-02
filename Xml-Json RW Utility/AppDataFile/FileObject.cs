@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Xml_Json_RW_Utility.AppDataFile
+﻿namespace Xml_Json_RW_Utility.AppDataFile
 {
     // Объект для взаимодействия с типом файла
     internal class FileObject

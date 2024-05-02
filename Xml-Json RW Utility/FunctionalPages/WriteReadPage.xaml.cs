@@ -11,18 +11,18 @@ using Xml_Json_RW_Utility.FunctionalWindows;
 
 namespace Xml_Json_RW_Utility.FunctionalPages
 {
-    public partial class WritePage : Page
+    public partial class WriteReadPage : Page
     {
         private OpenFileDialog openFileDialog;
         private Dictionary<string, List<string>> tagAndElements;
-
         private XmlDocument savedXmlDocument;
         private string savedXmlPath;
         private JObject savedJsonDocument;
         private string savedJsonPath;
+        private bool isXml;
 
         // Страница чтения/записи
-        public WritePage(string fileType)
+        public WriteReadPage(string fileType)
         {
             InitializeComponent();
 
@@ -33,8 +33,8 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             savedJsonDocument = new JObject();
 
             // Определение типа файла для работы и соответствующего оформления окна для него
-            FileObject.fileType = fileType;
-            if (FileObject.fileType.Equals(".xml"))
+            isXml = StringCheck.IsXmlFile(FileObject.fileType);
+            if (isXml)
             {
                 openFileDialog.Filter = "XML Files (*.xml)|*.xml";
                 labelWriteRead.Content += " XML";
@@ -58,14 +58,6 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         private void ButtonBack_Click(object sender, RoutedEventArgs e)
         {
             HomeObjects.frameHome.Navigate(new HomePage(FileObject.fileType));
-            if(FileObject.fileType.Equals(".xml"))
-            {
-                HomeObjects.labelHome.Foreground = Brushes.PaleGreen;
-            }
-            else
-            {
-                HomeObjects.labelHome.Foreground = Brushes.Gold;
-            }
         }
 
         // Сброс информации в файле, если были изменения
@@ -76,7 +68,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
             if (MessageBoxObject.resultMessage == MessageBoxResult.Yes)
             {
-                if (FileObject.fileType.Equals(".xml"))
+                if (isXml)
                 {
                     try
                     {
@@ -141,7 +133,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         {
             if (openFileDialog.ShowDialog() == true)
             {
-                if (FileObject.fileType.Equals(".xml"))
+                if (isXml)
                 {
                     labelFileName.Content = openFileDialog.SafeFileName.Replace(".xml", "");
 
@@ -157,7 +149,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 }
             }
 
-            if (FileObject.fileType.Equals(".xml"))
+            if (isXml)
             {
                 LoadXml();
             }
@@ -374,33 +366,50 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 // Добавление тега
                 if (!string.IsNullOrEmpty(textBoxTagPost.Text))
                 {
-                    if (FileObject.fileType.Equals(".xml"))
+                    if (StringCheck.IsValidName(textBoxTagPost.Text))
                     {
-                        XmlDocument doc = new XmlDocument();
-                        doc.Load(openFileDialog.FileName);
-                        XmlNode rootNode = doc.DocumentElement;
+                        if (StringCheck.IsTagExist(textBoxTagPost.Text, tagAndElements))
+                        {
+                            if (isXml)
+                            {
+                                XmlDocument doc = new XmlDocument();
+                                doc.Load(openFileDialog.FileName);
+                                XmlNode rootNode = doc.DocumentElement;
 
-                        XmlNode newTag = doc.CreateNode(XmlNodeType.Element, textBoxTagPost.Text, "");
-                        rootNode.AppendChild(newTag);
-                        doc.Save(openFileDialog.FileName); 
+                                XmlNode newTag = doc.CreateNode(XmlNodeType.Element, textBoxTagPost.Text, "");
+                                newTag.InnerText = "";
+                                rootNode.AppendChild(newTag);
+                                doc.Save(openFileDialog.FileName);
+                            }
+                            else
+                            {
+                                JObject jsonObject = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
+
+                                JObject newNode = new JObject();
+                                jsonObject["Root"][textBoxTagPost.Text] = newNode;
+
+                                File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
+                            }  
+                        }
+                        else
+                        {
+                            InfoWindow warningWindow = new InfoWindow($"Тег с именем {textBoxTagPost.Text} уже существует", Brushes.Orange);
+                            warningWindow.ShowDialog();
+                        }
                     }
                     else
                     {
-                        JObject jsonObject = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
-
-                        JObject newNode = new JObject();
-                        jsonObject["Root"][textBoxTagPost.Text] = newNode;
-
-                        File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
+                        InfoWindow warningWindow = new InfoWindow("Название тега не должно начинаться на цифру и содержать знаков препинания", Brushes.Orange);
+                        warningWindow.ShowDialog();
                     }
 
                     textBoxTagPost.Text = null;
-                }
+                }               
 
                 // Удаление тега
                 if (comboBoxTagDelete.SelectedItem != null)
                 {
-                    if (FileObject.fileType.Equals(".xml"))
+                    if (isXml)
                     {
                         XmlDocument doc = new XmlDocument();
                         doc.Load(openFileDialog.FileName);
@@ -426,31 +435,47 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 // Добавление элемента в тег
                 if (comboBoxElementPostIn.SelectedItem != null && !string.IsNullOrEmpty(textBoxElementPost.Text))
                 {
-                    if (FileObject.fileType.Equals(".xml"))
-                    {
-                        XmlDocument doc = new XmlDocument();
-                        doc.Load(openFileDialog.FileName);
-                        XmlNode rootNode = doc.DocumentElement;
-                        XmlNode selectedElement = rootNode.SelectSingleNode(comboBoxElementPostIn.SelectedItem.ToString());
-
-                        if (selectedElement != null)
+                    if (StringCheck.IsValidName(textBoxElementPost.Text))
+                    {                       
+                        if (StringCheck.IsElementExist(isXml, textBoxElementPost.Text, tagAndElements[comboBoxElementPostIn.SelectedItem.ToString()]))
                         {
-                            XmlElement newElement = doc.CreateElement(textBoxElementPost.Text);
-                            XmlText elementText = doc.CreateTextNode("");
+                            if (isXml)
+                            {
+                                XmlDocument doc = new XmlDocument();
+                                doc.Load(openFileDialog.FileName);
+                                XmlNode rootNode = doc.DocumentElement;
+                                XmlNode selectedElement = rootNode.SelectSingleNode(comboBoxElementPostIn.SelectedItem.ToString());
 
-                            newElement.AppendChild(elementText);
-                            selectedElement.AppendChild(newElement);
-                            doc.Save(openFileDialog.FileName);
+                                if (selectedElement != null)
+                                {
+                                    XmlElement newElement = doc.CreateElement(textBoxElementPost.Text);
+                                    XmlText elementText = doc.CreateTextNode("");
+
+                                    newElement.AppendChild(elementText);
+                                    selectedElement.AppendChild(newElement);
+                                    doc.Save(openFileDialog.FileName);
+                                }
+                            }
+                            else
+                            {
+                                JObject jsonObject = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
+
+                                JObject selectedNodeObject = (JObject)jsonObject["Root"][comboBoxElementPostIn.SelectedItem.ToString()];
+                                selectedNodeObject[textBoxElementPost.Text] = "";
+
+                                File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
+                            }  
+                        }
+                        else
+                        {
+                            InfoWindow warningWindow = new InfoWindow($"Элемент с именем {textBoxElementPost.Text} уже существует", Brushes.Orange);
+                            warningWindow.ShowDialog();
                         }
                     }
                     else
                     {
-                        JObject jsonObject = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
-
-                        JObject selectedNodeObject = (JObject)jsonObject["Root"][comboBoxElementPostIn.SelectedItem.ToString()];
-                        selectedNodeObject[textBoxElementPost.Text] = "";
-
-                        File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
+                        InfoWindow warningWindow = new InfoWindow("Название элемента не должно начинаться на цифру и содержать знаков препинания", Brushes.Orange);
+                        warningWindow.ShowDialog();
                     }
 
                     textBoxElementPost.Text = null;
@@ -459,7 +484,8 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 // Удаление элемента из тега
                 if (comboBoxElementDeleteFrom.SelectedItem != null && comboBoxElementDelete.SelectedItem != null)
                 {
-                    if (FileObject.fileType.Equals(".xml"))
+                    string elementString = StringCheck.ElementWithoutSymbols(isXml, comboBoxElementDelete.SelectedItem.ToString());
+                    if (isXml)
                     {
                         XmlDocument doc = new XmlDocument();
                         doc.Load(openFileDialog.FileName);
@@ -468,11 +494,6 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                         if (parentTag != null)
                         {
-                            string elementString = comboBoxElementDelete.SelectedItem.ToString();
-                            int startIndex = elementString.IndexOf("<") + 1;
-                            int endIndex = elementString.IndexOf(">", startIndex);
-                            elementString = elementString.Substring(startIndex, endIndex - startIndex);
-
                             XmlNode elementToRemove = parentTag.SelectSingleNode(elementString);
 
                             if (elementToRemove != null)
@@ -488,11 +509,6 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
                         JObject parentNode = (JObject)jsonObject["Root"][comboBoxElementDeleteFrom.SelectedItem.ToString()];
 
-                        string elementString = comboBoxElementDelete.SelectedItem.ToString();
-                        int startIndex = elementString.IndexOf("\"") + 1;
-                        int endIndex = elementString.IndexOf("\"", startIndex);
-                        elementString = elementString.Substring(startIndex, endIndex - startIndex);
-
                         parentNode.Property(elementString).Remove();
 
                         File.WriteAllText(openFileDialog.FileName, jsonObject.ToString());
@@ -501,7 +517,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
 
 
                 // Обновление информации на странице после изменений
-                if (FileObject.fileType.Equals(".xml"))
+                if (isXml)
                 {
                     LoadXml();
                 }
@@ -511,14 +527,11 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                 }
 
                 buttonClear.IsEnabled = true;
-
-                InfoWindow infoWindow = new InfoWindow("Изменения успешно применены!", Brushes.LimeGreen);
-                infoWindow.ShowDialog();
             }
             catch (Exception ex)
             {
-                InfoWindow infoWindow = new InfoWindow("Не удалось изменить элемент.", Brushes.Firebrick);
-                infoWindow.ShowDialog();
+                InfoWindow errorWindow = new InfoWindow("Не удалось применить изменения.", Brushes.Firebrick);
+                errorWindow.ShowDialog();
 
                 Console.WriteLine(ex.Message);
             }           
@@ -529,7 +542,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
         {
             try
             {
-                if (FileObject.fileType.Equals(".xml"))
+                if (isXml)
                 {
                     XmlDocument doc = new XmlDocument();
                     doc.Load(openFileDialog.FileName);
@@ -542,14 +555,11 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                     XmlNode parentTag = root.SelectSingleNode(nodeName.Split('.')[0]);
                     if (parentTag != null)
                     {
-                        string elementString = nodeName.Split('.')[1];
-                        int startIndex = elementString.IndexOf("<") + 1;
-                        int endIndex = elementString.IndexOf(">", startIndex);
-                        elementString = elementString.Substring(startIndex, endIndex - startIndex);
+                        string elementString = StringCheck.ElementWithoutSymbols(isXml, nodeName.Split('.')[1]);
 
                         XmlNode elementToEdit = parentTag.SelectSingleNode(elementString);
 
-                        EditWindow editWindow = new EditWindow(elementToEdit, elementString);
+                        EditWindow editWindow = new EditWindow(elementToEdit.InnerText, elementString);
                         editWindow.ShowDialog();
 
                         XmlNode elementNew = doc.CreateElement(elementString);
@@ -573,10 +583,7 @@ namespace Xml_Json_RW_Utility.FunctionalPages
                     JToken parentTag = root.SelectToken(nodeName.Split('.')[0]);
                     if (parentTag != null)
                     {
-                        string elementString = nodeName.Split('.')[1];
-                        int startIndex = elementString.IndexOf("\"") + 1;
-                        int endIndex = elementString.IndexOf("\"", startIndex);
-                        elementString = elementString.Substring(startIndex, endIndex - startIndex);
+                        string elementString = StringCheck.ElementWithoutSymbols(isXml, nodeName.Split('.')[1]);
 
                         JToken elementToEdit = parentTag.SelectToken(elementString);
 
@@ -596,8 +603,8 @@ namespace Xml_Json_RW_Utility.FunctionalPages
             }
             catch (Exception ex)
             {
-                InfoWindow infoWindow = new InfoWindow("Не удалось изменить элемент.", Brushes.Firebrick);
-                infoWindow.ShowDialog();
+                InfoWindow errorWindow = new InfoWindow("Не удалось изменить элемент.", Brushes.Firebrick);
+                errorWindow.ShowDialog();
 
                 Console.WriteLine(ex.Message);
             }

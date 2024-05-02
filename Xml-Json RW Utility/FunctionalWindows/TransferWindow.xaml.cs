@@ -12,6 +12,7 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
     public partial class TransferWindow : Window
     {
         private OpenFileDialog openFileDialog;
+        private bool isXml;
 
         // Диалоговое окно конвертации файла
         public TransferWindow(string fileType)
@@ -21,8 +22,8 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
             openFileDialog = new OpenFileDialog();
 
             // Определение типа файла для работы и соответствующего оформления для него
-            FileObject.fileType = fileType;
-            if (FileObject.fileType.Equals(".xml"))
+            isXml = StringCheck.IsXmlFile(FileObject.fileType);
+            if (isXml)
             {
                 buttonSelectFile.Background = Brushes.PaleGreen;
                 labelTypeTransfer.Content = "Выберите xml файл для конвертации";
@@ -41,7 +42,7 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
         {
             if (openFileDialog.ShowDialog() == true)
             {
-                if(FileObject.fileType.Equals(".xml"))
+                if(isXml)
                 {
                     labelFileName.Content = openFileDialog.SafeFileName.Replace(".xml", "");
                     labelFileName.Foreground = Brushes.PaleGreen;
@@ -58,7 +59,7 @@ namespace Xml_Json_RW_Utility.FunctionalWindows
         // Подтверждение и выбор перевода файла
         private void ButtonConfirm_Click(object sender, RoutedEventArgs e)
         {
-            if (FileObject.fileType.Equals(".xml"))
+            if (isXml)
             {
                 ChangeToJson();
             }

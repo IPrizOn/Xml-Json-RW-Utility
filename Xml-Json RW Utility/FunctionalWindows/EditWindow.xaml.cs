@@ -1,37 +1,34 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using System.Xml;
+using Xml_Json_RW_Utility.AppDataFile;
 
 namespace Xml_Json_RW_Utility.FunctionalWindows
 {
     public partial class EditWindow : Window
     {
         public string EditNode { get; set; }
+        private bool isXml;
 
         // Диалоговое окно изменения xml элемента
-        public EditWindow(XmlNode node, string tag)
-        {
-            InitializeComponent();
-
-            // Отображение изменяемого элемента и соответствующего для него цвета
-            labelElementName.Foreground = Brushes.PaleGreen;
-            labelElementName.Text = tag;
-
-            EditNode = node.InnerText;
-            textBoxElementValue.Text = node.InnerText;
-        }
-
-        // Диалоговое окно изменения json элемента
         public EditWindow(string node, string tag)
         {
             InitializeComponent();
 
             // Отображение изменяемого элемента и соответствующего для него цвета
-            labelElementName.Foreground = Brushes.Gold; 
-            labelElementName.Text = tag;
+            isXml = StringCheck.IsXmlFile(FileObject.fileType);
+            if (isXml)
+            {
+                labelElementName.Foreground = Brushes.PaleGreen;                 
+            }
+            else
+            {
+                labelElementName.Foreground = Brushes.Gold;
+            }
 
+            labelElementName.Text = tag;
+            textBoxElementValue.Text = node;
             EditNode = node;
-            textBoxElementValue.Text= node;
         }
 
         // Сохранение изменений
